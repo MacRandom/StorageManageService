@@ -5,13 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
-namespace StorageManageService
+namespace StorageManageService.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            Configuration = configuration;
+            Configuration = new ConfigurationBuilder()
+                .AddConfiguration(configuration)
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json")
+                .Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -20,7 +24,7 @@ namespace StorageManageService
         {
             services.AddDbContext<StorageContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
+
             services.AddControllers();
         }
 
